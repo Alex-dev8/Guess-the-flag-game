@@ -20,6 +20,12 @@ class ViewController: UIViewController {
     var score = 0
     var correctAnswer = 0
     var questionsAsked = 0
+    var topScore = 0  {
+        didSet {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Top Score: \(topScore)")
+        }
+    }
+    
     
     // MARK: - ViewDidLoad
     override func viewDidLoad() {
@@ -37,9 +43,14 @@ class ViewController: UIViewController {
         button2.layer.borderColor = UIColor.lightGray.cgColor
         button3.layer.borderColor = UIColor.lightGray.cgColor
         
+        
+        
         // create button
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Score", style: .plain, target: self, action: #selector(viewScore))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Top Score: \(topScore)", style: .plain, target: self, action: nil)
         
+        let defaults = UserDefaults.standard
+        topScore = defaults.object(forKey: "TopScore") as? Int ?? 0
         askQuestion()
     }
     
@@ -82,9 +93,10 @@ class ViewController: UIViewController {
             score -= 1
         }
         viewScore()
+        topScoreKeeper()
         
         // set up alert to tell user if answer is correct and total score
-        let ac = UIAlertController(title: title, message: "Your score was \(score)", preferredStyle: .alert)
+        let ac = UIAlertController(title: title, message: "Your score is \(score)", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
         present(ac, animated: true)
         questionsAsked += 1
@@ -93,6 +105,14 @@ class ViewController: UIViewController {
     // view score on button
     @objc func viewScore() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: String(score))
+    }
+    
+    func topScoreKeeper() {
+        let defaults = UserDefaults.standard
+        if score > topScore {
+            topScore = score
+        }
+        defaults.set(topScore, forKey: "TopScore")
     }
     
 }
